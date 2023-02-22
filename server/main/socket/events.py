@@ -10,6 +10,7 @@ from ...app import socketio
 params = {}
 text_blobs = {}
 corr = GrammarCorrection('entries.train')
+threads = []
 
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
@@ -20,9 +21,11 @@ def handle_message(data):
     thread_conf = Thread(target=detect_confidence, args=(data,))
     thread_conf.daemon = False
     thread_conf.start()
+    threads.append(thread_conf)
     thread_grammar = Thread(target=grammar_analysis, args=(data,))
     thread_grammar.daemon = False
     thread_grammar.start()
+    threads.append(thread_grammar)
     send( jsonify(
         {
             'thread_name1': str(thread_conf.name),
@@ -62,6 +65,8 @@ def candidate_exit(data):
 def interviewer_exit(data):
     leave_room(data['room_id'])
     print('candidate exited : ' + data['room_id'])
+    for thread in threads:
+        thread.join()
     params[data['room_id']][0]/=int(data['no_of_chunks'])
     params[data['room_id']][1]/=int(data['no_of_chunks'])
     params[data['room_id']][2]/=int(data['no_of_chunks'])
