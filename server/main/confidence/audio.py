@@ -71,6 +71,8 @@ def process_func(
     sampling_rate = 16000
     y = processor(x, sampling_rate=sampling_rate)
     y = y['input_values'][0]
+    y = y.reshape(1,-1)
+    print(y.shape)
     y = torch.from_numpy(y).to(device)
 
     print("infering")
@@ -84,6 +86,6 @@ def process_func(
     return y
 
 def infer(blob):
-    data_s16 = np.frombuffer(blob, dtype=np.int16, count=len(bytes)//2, offset=0)
+    data_s16 = np.frombuffer(blob, dtype=np.int16, count=len(blob)//2, offset=0)
     float_data = data_s16 * 0.5**15
     return process_func(float_data)

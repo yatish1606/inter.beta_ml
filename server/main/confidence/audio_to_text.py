@@ -1,10 +1,8 @@
-from transformers import Speech2TextProcessor, Speech2TextForConditionalGeneration
-
-model = Speech2TextForConditionalGeneration.from_pretrained("facebook/s2t-small-librispeech-asr")
-processor = Speech2TextProcessor.from_pretrained("facebook/s2t-small-librispeech-asr")
-
+import torch
 
 def convert(audio,sampling_rate):
-    inputs = processor(audio, sampling_rate=sampling_rate, return_tensors="pt")
-    generated_ids = model.generate(inputs["input_features"], attention_mask=inputs["attention_mask"])
-    return processor.batch_decode(generated_ids, skip_special_tokens=True)
+    speech, _ = sf.read(r"C:\Users\rohan_naik\Desktop\semicolons23_feed.back_backend\server\Fanfare60.wav")
+    inputs = processor(speech, sampling_rate=16_000, return_tensors="pt")
+    generated_ids = model.generate(inputs=inputs["input_values"], attention_mask=inputs["attention_mask"])
+    transcription = processor.batch_decode(generated_ids)
+    return transcription

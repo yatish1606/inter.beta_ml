@@ -1,7 +1,7 @@
 import tensorflow as tf
-from encoder import Encoder
-from decoder import Decoder
-from preprocess import Preprocess
+from .encoder import Encoder
+from .decoder import Decoder
+from .preprocess import Preprocess
 import numpy as np
 from  tensorflow.keras.preprocessing.sequence import pad_sequences
 
@@ -64,6 +64,7 @@ class encoder_decoder(tf.keras.Model):
 
 class GrammarCorrection:
     def __init__(self,path) -> None:
+        path = r"C:\Users\rohan_naik\Desktop\semicolons23_feed.back_backend\server\main\static\v1.h5"
         self.tk_inp,self.tk_out = Preprocess().get_tokenizers()
         self.model = encoder_decoder(enc_vocab_size=len(self.tk_inp.word_index)+1,
                          enc_emb_dim = 300,
@@ -74,8 +75,10 @@ class GrammarCorrection:
                          dec_input_length = 35,
                          att_units=256,
                          batch_size=512)
+        print(self.model.layers)
+        self.model.built = True
         self.model.compile(optimizer="adam",loss='sparse_categorical_crossentropy')
-        self.model.load_weights(path)
+        self.model.load_weights(path, by_name = True, skip_mismatch = True)
     
     def infer(self,sentence):
         # forming integer sequences
@@ -83,7 +86,7 @@ class GrammarCorrection:
         # padding the sequences
         seq = pad_sequences(seq,maxlen = 20 , padding="post")
         # generating the output from encoder
-        enc_output,state_h,state_c= self.model.layers[2](seq)
+        enc_output,state_h,state_c= self.model.layers[0](seq)
         # placeholder for predicted output
         pred = []
         input_state = [state_h,state_c]

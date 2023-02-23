@@ -4,7 +4,7 @@
 # gr = GrammarCorrection('./main/socket/vocab.train')
 # gr.infer('i has a good boy')
 
-from main.confidence.audio import infer
+from main.confidence.audio_to_text import convert
 
-file = open('Fanfare.wav','r')
-print(infer(file))
+file = open('Fanfare60.wav','rb')
+print(convert(file.read(),160000))

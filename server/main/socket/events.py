@@ -65,6 +65,16 @@ def candidate_exit(data):
 def interviewer_exit(data):
     leave_room(data['room_id'])
     print('candidate exited : ' + data['room_id'])
+    thread = Thread(target=accumulate_and_store,args=(data))
+    thread.daemon = True
+    thread.start()
+    emit('on_candidate_exit')
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
+
+def accumulate_and_store(data):
     for thread in threads:
         thread.join()
     params[data['room_id']][0]/=int(data['no_of_chunks'])
@@ -82,11 +92,7 @@ def interviewer_exit(data):
             'metric' : total_correctness / len(text_blobs[data['room_id']])
         }
     }
-    emit('on_candidate_exit',args=(args))
-
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected')
+    # send args to node js server -> update interview status
 
 def detect_confidence(data):
     conf = infer(data['file'])
@@ -106,3 +112,4 @@ def grammar_analysis(data):
                 'similarity' : similar(line,correct)
             }
         )
+    

@@ -4,7 +4,7 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 
 class Preprocess:
     def __init__(self) -> None:
-        input = open("entries.train",'r')
+        input = open(r"C:\Users\rohan_naik\Desktop\semicolons23_feed.back_backend\server\main\grammar\vocab.train",'r')
         file = input.read(10000000).split('\n')
         data = []
         labels = []
