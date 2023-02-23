@@ -1,5 +1,5 @@
 from threading import Thread
-from grammar.gr_corr import GrammarCorrection
+from grammar.corr import infer
 from confidence.audio import infer
 from confidence.audio_to_text import convert
 from flask_socketio import join_room, leave_room,send,emit
@@ -9,7 +9,6 @@ from ...app import socketio
 
 params = {}
 text_blobs = {}
-corr = GrammarCorrection('entries.train')
 threads = []
 
 def similar(a, b):
@@ -105,7 +104,7 @@ def grammar_analysis(data):
     text = convert(data['file'])
     print('Converted Text : ',text)
     for line in text.split('.'):
-        correct = corr.predict(line)
+        correct = infer(line)
         text_blobs[data['room_id']].append(
             {
                 'corrected' : correct,
